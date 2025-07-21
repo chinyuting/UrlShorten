@@ -37,6 +37,10 @@ export default function UrlShorten() {
   };
 
   const handleGetMeta = async () => {
+    if (!originUrl.trim()) {
+      toast.error("請輸入連結");
+      return;
+    }
     try {
       const res = await axios.post(`${API_BASEURL}/api/scrape`, {
         url: originUrl,
