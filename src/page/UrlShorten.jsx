@@ -90,7 +90,13 @@ export default function UrlShorten() {
         setUrlList(updated);
         localStorage.setItem("urlDatabase", JSON.stringify(updated));
 
-        toast.success("縮址成功！");
+        toast.success("縮址成功！短網址結果請看下方表格");
+
+        setOriginUrl("");
+        setComment("");
+        setMeta({ title: "" });
+        setPassword("");
+        urlShortenRef.current.value = "";
       } else {
         setAlertMsg({ title: "錯誤", message: "短網址產生失敗" });
         setShowAlert(true);
@@ -102,6 +108,43 @@ export default function UrlShorten() {
         message: "這個短網址可能已經被使用了，請嘗試使用不同的名稱後再試一次。",
       });
       setShowAlert(true);
+    }
+  };
+
+  const toggleUrlActive = async (shortCode) => {
+    // 先備份原本的 urlList
+    const originalList = [...urlList];
+
+    // 產生新的 urlList 陣列（切換狀態）
+    const updatedList = urlList.map((item) => {
+      if (item.shortCode === shortCode) {
+        return { ...item, isUrlActive: !item.isUrlActive };
+      }
+      return item;
+    });
+
+    // 先更新前端狀態與 localStorage
+    setUrlList(updatedList);
+    localStorage.setItem("urlDatabase", JSON.stringify(updatedList));
+
+    // 找到剛更新的項目，送 API 更新後端
+    const updatedItem = updatedList.find(
+      (item) => item.shortCode === shortCode
+    );
+
+    try {
+      await axios.put(`${API_BASEURL}/api/updateUrlActive`, {
+        shortCode: updatedItem.shortCode,
+        isUrlActive: updatedItem.isUrlActive,
+      });
+      toast.success("更新成功！");
+    } catch (error) {
+      setAlertMsg({ title: "錯誤", message: "更新啟用狀態失敗" });
+      setShowAlert(true);
+
+      // 更新失敗，恢復原本的狀態
+      setUrlList(originalList);
+      localStorage.setItem("urlDatabase", JSON.stringify(originalList));
     }
   };
 
@@ -245,6 +288,65 @@ export default function UrlShorten() {
           </button>
         </div>
       </form>
+
+      <div className="divide-y divide-gray-200 border border-gray-300 rounded-xl overflow-hidden mt-5 max-w-6xl mx-auto">
+        <div className="grid grid-cols-8 font-semibold bg-gray-100 text-gray-700 px-4 py-2 gap-2">
+          <div className="col-span-2">短網址</div>
+          <div className="col-span-2">原網址</div>
+          <div className="col-span-2">備註說明</div>
+          <div className="col-span-1">是否啟用</div>
+          <div className="col-span-1">是否加密</div>
+        </div>
+
+        {urlList.map((item) => (
+          <div
+            key={item.shortCode}
+            className="grid grid-cols-8 px-4 py-3 items-start bg-white hover:bg-gray-50 text-sm break-words gap-2"
+          >
+            <a
+              href={`http://localhost:5173/${item.shortCode}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline col-span-2"
+            >
+              {`http://localhost:5173/${item.shortCode}`}
+            </a>
+            <div className="text-gray-800 col-span-2">{item.originalUrl}</div>
+            <div className="text-gray-800 col-span-2">{item.comment}</div>
+            <div className="text-gray-800 col-span-1 flex items-center">
+              <label className="flex items-center cursor-pointer select-none">
+                <input
+                  id={`url-toggle-${item.shortCode}`}
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={item.isUrlActive}
+                  onChange={() => toggleUrlActive(item.shortCode)}
+                />
+                <div className="w-5 h-5 border-2 border-gray-300 rounded-md flex items-center justify-center transition peer-checked:bg-gray-600 peer-checked:border-gray-600"></div>
+                <svg
+                  className="w-5 h-5 text-white hidden peer-checked:block absolute"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span className="hidden md:inline-block ml-2 text-sm text-gray-700 font-medium">
+                  {item.isUrlActive ? "已啟用" : "未啟用"}
+                </span>
+              </label>
+            </div>
+            <div className="text-gray-800 col-span-1">
+              {item.isSecret ? "已加密" : "無"}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
