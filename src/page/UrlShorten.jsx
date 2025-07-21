@@ -23,6 +23,9 @@ export default function UrlShorten() {
   const [comment, setComment] = useState("");
   const [isUrlActive, setIsUrlActive] = useState(true);
   const [password, setPassword] = useState("");
+  const [urlList, setUrlList] = useState(() => {
+    return JSON.parse(localStorage.getItem("urlDatabase") || "[]");
+  });
 
   const togglePasswordVisibility = () => {
     setIsShowPassword((prev) => !prev);
@@ -50,6 +53,54 @@ export default function UrlShorten() {
       setComment(combined);
     } catch (error) {
       setAlertMsg({ title: "錯誤", message: "取得頁面資訊失敗" });
+      setShowAlert(true);
+    }
+  };
+
+  const handleShorten = async () => {
+    try {
+      const originalUrl = originUrl.trim();
+      const customCode = urlShortenRef.current?.value.trim();
+
+      if (!originalUrl) {
+        setAlertMsg({ title: "錯誤", message: "請輸入連結或貼上完整網址" });
+        setShowAlert(true);
+        return;
+      }
+
+      const res = await axios.post(`${API_BASEURL}/api/shorten`, {
+        originalUrl,
+        customCode: customCode || null,
+        isUrlActive,
+        comment,
+        password,
+      });
+
+      if (res.data.shortUrl) {
+        urlShortenRef.current.value = res.data.shortUrl;
+        const newData = {
+          shortCode: res.data.shortCode,
+          originalUrl: originalUrl,
+          isUrlActive: isUrlActive,
+          isSecret: password.trim().length !== 0,
+          comment: comment,
+          createdAt: new Date().toISOString(),
+        };
+        const updated = [newData, ...urlList];
+        setUrlList(updated);
+        localStorage.setItem("urlDatabase", JSON.stringify(updated));
+
+        toast.success("縮址成功！");
+      } else {
+        setAlertMsg({ title: "錯誤", message: "短網址產生失敗" });
+        setShowAlert(true);
+      }
+    } catch (error) {
+      setAlertMsg({ title: "錯誤", message: "短網址產生失敗" });
+      setAlertMsg({
+        title: "無法建立短網址",
+        message: "這個短網址可能已經被使用了，請嘗試使用不同的名稱後再試一次。",
+      });
       setShowAlert(true);
     }
   };
@@ -188,6 +239,7 @@ export default function UrlShorten() {
           <button
             type="button"
             className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 cursor-pointer"
+            onClick={handleShorten}
           >
             產生短網址
           </button>
