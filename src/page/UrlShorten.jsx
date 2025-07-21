@@ -15,6 +15,7 @@ const API_BASEURL = "http://localhost:3001";
 export default function UrlShorten() {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [originUrl, setOriginUrl] = useState("");
+  const [meta, setMeta] = useState({ title: "" });
   const [comment, setComment] = useState("");
   const [isUrlActive, setIsUrlActive] = useState(true);
   const [password, setPassword] = useState("");
@@ -28,6 +29,19 @@ export default function UrlShorten() {
     const urlShorten = urlShortenRef.current;
     if (urlShorten && urlShorten.value) {
       navigator.clipboard.writeText(urlShorten.value);
+    }
+  };
+
+  const handleGetMeta = async () => {
+    try {
+      const res = await axios.post(`${API_BASEURL}/api/scrape`, {
+        url: originUrl,
+      });
+      const combined = `${res.data.title}`;
+      setMeta({ title: res.data.title });
+      setComment(combined);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -112,6 +126,7 @@ export default function UrlShorten() {
             <button
               type="button"
               className="bg-gray-700 hover:bg-gray-600 text-white py-1 px-2 flex gap-2 items-center rounded ml-2 text-sm font-normal cursor-pointer"
+              onClick={handleGetMeta}
             >
               <FontAwesomeIcon icon={faCloudArrowDown} />
               取得頁面資訊
