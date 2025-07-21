@@ -9,10 +9,14 @@ import {
   faEye,
   faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
+import Alert from "../components/Alert";
 
 const API_BASEURL = "http://localhost:3001";
 
 export default function UrlShorten() {
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMsg, setAlertMsg] = useState({ title: "", message: "" });
+
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [originUrl, setOriginUrl] = useState("");
   const [meta, setMeta] = useState({ title: "" });
@@ -41,7 +45,8 @@ export default function UrlShorten() {
       setMeta({ title: res.data.title });
       setComment(combined);
     } catch (error) {
-      console.log(error);
+      setAlertMsg({ title: "錯誤", message: "取得頁面資訊失敗" });
+      setShowAlert(true);
     }
   };
 
@@ -53,6 +58,13 @@ export default function UrlShorten() {
 
   return (
     <div className="p-7 md:p-10 min-h-screen">
+      {showAlert && (
+        <Alert
+          title={alertMsg.title}
+          message={alertMsg.message}
+          onClose={() => setShowAlert(false)}
+        />
+      )}
       <form className="grid grid-cols-1 md:grid-cols-8 gap-3 max-w-6xl mx-auto rounded bg-gray-100 p-6">
         <div className="md:col-span-4">
           <label htmlFor="originUrl" className={labelClass}>
