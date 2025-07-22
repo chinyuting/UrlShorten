@@ -36,6 +36,7 @@ export default function UrlShorten() {
     const urlShorten = urlShortenRef.current;
     if (urlShorten && urlShorten.value) {
       navigator.clipboard.writeText(urlShorten.value);
+      toast.success("已複製");
     }
   };
 

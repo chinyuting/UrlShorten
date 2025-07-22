@@ -1,10 +1,12 @@
 import React from "react";
+import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
 
 export default function UrlTable({ urlList, toggleUrlActive }) {
   const handleCopy = (shortUrl) => {
     navigator.clipboard.writeText(shortUrl);
+    toast.success("已複製");
   };
 
   return (
