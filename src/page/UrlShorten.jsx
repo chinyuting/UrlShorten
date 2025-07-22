@@ -11,8 +11,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Alert from "../components/Alert";
 
-const API_BASEURL = "http://localhost:3001";
-
 export default function UrlShorten() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMsg, setAlertMsg] = useState({ title: "", message: "" });
@@ -45,9 +43,12 @@ export default function UrlShorten() {
       return;
     }
     try {
-      const res = await axios.post(`${API_BASEURL}/api/scrape`, {
-        url: originUrl,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/scrape`,
+        {
+          url: originUrl,
+        }
+      );
       const combined = `${res.data.title}`;
       setMeta({ title: res.data.title });
       setComment(combined);
@@ -68,13 +69,16 @@ export default function UrlShorten() {
         return;
       }
 
-      const res = await axios.post(`${API_BASEURL}/api/shorten`, {
-        originalUrl,
-        customCode: customCode || null,
-        isUrlActive,
-        comment,
-        password,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/shorten`,
+        {
+          originalUrl,
+          customCode: customCode || null,
+          isUrlActive,
+          comment,
+          password,
+        }
+      );
 
       if (res.data.shortUrl) {
         urlShortenRef.current.value = res.data.shortUrl;
@@ -112,10 +116,8 @@ export default function UrlShorten() {
   };
 
   const toggleUrlActive = async (shortCode) => {
-    // 先備份原本的 urlList
     const originalList = [...urlList];
 
-    // 產生新的 urlList 陣列（切換狀態）
     const updatedList = urlList.map((item) => {
       if (item.shortCode === shortCode) {
         return { ...item, isUrlActive: !item.isUrlActive };
@@ -123,17 +125,15 @@ export default function UrlShorten() {
       return item;
     });
 
-    // 先更新前端狀態與 localStorage
     setUrlList(updatedList);
     localStorage.setItem("urlDatabase", JSON.stringify(updatedList));
 
-    // 找到剛更新的項目，送 API 更新後端
     const updatedItem = updatedList.find(
       (item) => item.shortCode === shortCode
     );
 
     try {
-      await axios.put(`${API_BASEURL}/api/updateUrlActive`, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/updateUrlActive`, {
         shortCode: updatedItem.shortCode,
         isUrlActive: updatedItem.isUrlActive,
       });
@@ -304,12 +304,12 @@ export default function UrlShorten() {
             className="grid grid-cols-8 px-4 py-3 items-start bg-white hover:bg-gray-50 text-sm break-words gap-2"
           >
             <a
-              href={`http://localhost:5173/${item.shortCode}`}
+              href={`${import.meta.env.VITE_REDIRECT_URL}/${item.shortCode}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline col-span-2"
             >
-              {`http://localhost:5173/${item.shortCode}`}
+              {`${import.meta.env.VITE_REDIRECT_URL}/${item.shortCode}`}
             </a>
             <div className="text-gray-800 col-span-2">{item.originalUrl}</div>
             <div className="text-gray-800 col-span-2">{item.comment}</div>

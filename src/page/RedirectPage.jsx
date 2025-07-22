@@ -16,14 +16,19 @@ const RedirectPage = () => {
   useEffect(() => {
     const checkPassword = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:3001/${code}`, {
-          params: { checkOnly: true },
-        });
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_API_URL}/${code}`,
+          {
+            params: { checkOnly: true },
+          }
+        );
 
         if (data.needPassword) {
           setShowModal(true);
         } else {
-          const res = await axios.get(`http://localhost:3001/${code}`);
+          const res = await axios.get(
+            `${import.meta.env.VITE_API_URL}/${code}`
+          );
           if (res.data.redirectUrl) {
             window.location.href = res.data.redirectUrl;
           } else {
@@ -44,7 +49,7 @@ const RedirectPage = () => {
 
   const handlePasswordSubmit = async (password) => {
     try {
-      const res = await axios.get(`http://localhost:3001/${code}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/${code}`, {
         params: { password },
       });
 
