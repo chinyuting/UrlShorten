@@ -1,6 +1,12 @@
 import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCopy } from "@fortawesome/free-solid-svg-icons";
 
 export default function UrlTable({ urlList, toggleUrlActive }) {
+  const handleCopy = (shortUrl) => {
+    navigator.clipboard.writeText(shortUrl);
+  };
+
   return (
     <div className="max-w-6xl mx-auto mt-5 border border-gray-300 rounded-xl overflow-hidden">
       <div className="hidden md:grid grid-cols-8 font-semibold bg-gray-100 text-gray-700 px-4 py-2 gap-2">
@@ -21,27 +27,45 @@ export default function UrlTable({ urlList, toggleUrlActive }) {
             key={item.shortCode}
             className="grid grid-cols-1 md:grid-cols-8 gap-2 px-4 py-3 border-b border-gray-200 bg-white hover:bg-gray-50 break-words"
           >
-            <div className="md:col-span-2">
-              <div className="md:hidden font-semibold text-gray-600">
+            <div className="md:col-span-2 relative">
+              <div className="md:hidden font-semibold text-gray-600 mr-2">
                 短網址
               </div>
-              <a
-                href={`${import.meta.env.VITE_REDIRECT_URL}/${item.shortCode}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                {`${import.meta.env.VITE_REDIRECT_URL}/${item.shortCode}`}
-              </a>
+              <div className="flex gap-2 items-center">
+                <button
+                  type="button"
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() =>
+                    handleCopy(
+                      `${import.meta.env.VITE_REDIRECT_URL}/${item.shortCode}`
+                    )
+                  }
+                  title="複製短網址"
+                >
+                  <FontAwesomeIcon icon={faCopy} />
+                </button>
+                <div>
+                  <a
+                    href={`${import.meta.env.VITE_REDIRECT_URL}/${
+                      item.shortCode
+                    }`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline break-all"
+                  >
+                    {`${import.meta.env.VITE_REDIRECT_URL}/${item.shortCode}`}
+                  </a>
+                </div>
+              </div>
             </div>
-            <div className="md:col-span-2">
-              <div className="md:hidden font-semibold text-gray-600">
+            <div className="md:col-span-2 flex items-center">
+              <div className="md:hidden font-semibold text-gray-600 mr-2">
                 原網址
               </div>
               <div className="text-gray-800">{item.originalUrl}</div>
             </div>
-            <div className="md:col-span-2">
-              <div className="md:hidden font-semibold text-gray-600">
+            <div className="md:col-span-2 flex items-center">
+              <div className="md:hidden font-semibold text-gray-600 mr-2">
                 備註說明
               </div>
               <div className="text-gray-800">{item.comment || "無"}</div>
