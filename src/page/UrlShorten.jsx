@@ -168,6 +168,7 @@ export default function UrlShorten() {
       <form className="grid grid-cols-1 md:grid-cols-8 gap-3 max-w-6xl mx-auto rounded bg-gray-100 p-6">
         <div className="md:col-span-4">
           <label htmlFor="originUrl" className={labelClass}>
+            <span className="text-red-400">*</span>
             連結
           </label>
           <input
