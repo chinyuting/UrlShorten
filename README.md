@@ -1,12 +1,37 @@
-# React + Vite
+# Url Shortener
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[前往網站](https://url-shortener-beige-pi.vercel.app/)
+一個簡單實用的縮網址平台，使用者可以將原始長網址轉換為簡短連結，並快速複製與分享。專案以前後端分離架構開發，並部署於 Vercel。
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# 技術架構
+- **Frontend**：React + Tailwind CSS  
+- **Backend**：Node.js + Express  
+- **Database**：MongoDB  
+- **Deploy**：Vercel
 
-## Expanding the ESLint configuration
+# 功能特色
+- 輸入長網址可自動產生短網址
+- 產生的短網址可複製並重新導向到原始網址
+- 可檢視所有建立過的短網址紀錄
+- 支援啟用 / 停用特定短網址
+- 支援手機與桌機版的響應式設計
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# 安裝與使用方式
+
+## 🔹 前端
+
+1. 安裝依賴套件
+
+```
+npm install
+
+2. 設定環境變數 .env
+```
+VITE_API_URL=你的後端 API 網址
+VITE_REDIRECT_URL=短網址重新導向用的 base URL
+
+3. 本機啟動專案
+```
+npm run dev
